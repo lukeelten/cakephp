@@ -247,7 +247,7 @@ class Cookie implements CookieInterface
     }
 
     /**
-     * @param string|null $sameSite
+     * @param string|null $sameSite Value for SameSite attribute
      * @return void
      * @throws \InvalidArgumentException
      * @link https://www.owasp.org/index.php/SameSite Valid values for SameSite
@@ -521,7 +521,6 @@ class Cookie implements CookieInterface
 
         return $new;
     }
-
 
     /**
      * Checks if a value exists in the cookie data.

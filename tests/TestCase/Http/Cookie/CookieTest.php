@@ -400,16 +400,25 @@ class CookieTest extends TestCase
         $this->assertSame('user', $new->getName());
     }
 
+    /**
+     * Test the getSameSite method
+     *
+     * @return void
+     */
     public function testGetSameSite()
     {
         $cookie = new Cookie('cakephp', 'cakephp-rocks');
         $this->assertSame('', $cookie->getSameSite());
 
-        $cookie = new Cookie('cakephp', 'cakephp-rocks',null,'/','',false,false,'strict');
+        $cookie = new Cookie('cakephp', 'cakephp-rocks', null, '/', '', false, false, 'strict');
         $this->assertSame('strict', $cookie->getSameSite());
-
     }
 
+    /**
+     * Test the withSameSite method
+     *
+     * @return void
+     */
     public function testWithSameSite()
     {
         $cookie = new Cookie('cakephp', 'cakephp-rocks');
@@ -419,10 +428,19 @@ class CookieTest extends TestCase
         $this->assertSame('lax', $cookie->getSameSite());
     }
 
+    /**
+     * Test the validateSameSite method
+     *
+     * @return void
+     */
     public function testInvalidSameSite()
     {
+        $cookie = new Cookie('cakephp', 'cakephp-rocks');
+        $cookie->withSameSite("strict")
+            ->withSameSite('lax');
+
         try {
-            $cookie = new Cookie('cakephp', 'cakephp-rocks',null,'/','',false,false,'cakephp');
+            $cookie = new Cookie('cakephp', 'cakephp-rocks', null, '/', '', false, false, 'cakephp');
             $this->fail('Expected InvalidArgumentException');
         } catch (\InvalidArgumentException $ex) {
             $this->assertSame(\InvalidArgumentException::class, get_class($ex));

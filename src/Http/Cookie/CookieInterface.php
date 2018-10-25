@@ -193,12 +193,17 @@ interface CookieInterface
     public function withSecure($secure);
 
     /**
+     * Get the current value for SameSite attribute
+     *
      * @return string
      */
     public function getSameSite();
 
     /**
-     * @param string|null $sameSite
+     * Set a new value for SameSite attribute
+     *
+     * @param string|null $sameSite SameSite attribute value
+     * @throws \InvalidArgumentException If the provided value is invalid
      * @return static
      */
     public function withSameSite($sameSite);
