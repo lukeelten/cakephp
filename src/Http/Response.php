@@ -20,7 +20,6 @@ use Cake\Filesystem\Folder;
 use Cake\Http\Cookie\Cookie;
 use Cake\Http\Cookie\CookieCollection;
 use Cake\Http\Cookie\CookieInterface;
-use Cake\Http\CorsBuilder;
 use Cake\Http\Exception\NotFoundException;
 use Cake\Log\Log;
 use DateTime;
@@ -2126,6 +2125,7 @@ class Response implements ResponseInterface
      *  - domain: Domain the cookie is for.
      *  - secure: Is the cookie https?
      *  - httpOnly: Is the cookie available in the client?
+     * - `sameSite`: SameSite value for cookie
      *
      * ### Examples
      *
@@ -2174,7 +2174,8 @@ class Response implements ResponseInterface
             'path' => '/',
             'domain' => '',
             'secure' => false,
-            'httpOnly' => false
+            'httpOnly' => false,
+            'sameSite' => null
         ];
         $expires = $options['expire'] ? new DateTime('@' . $options['expire']) : null;
         $cookie = new Cookie(
@@ -2184,7 +2185,8 @@ class Response implements ResponseInterface
             $options['path'],
             $options['domain'],
             $options['secure'],
-            $options['httpOnly']
+            $options['httpOnly'],
+            $options['sameSite']
         );
         $this->_cookies = $this->_cookies->add($cookie);
     }
@@ -2200,6 +2202,7 @@ class Response implements ResponseInterface
      * - `domain`: Domain the cookie is for.
      * - `secure`: Is the cookie https?
      * - `httpOnly`: Is the cookie available in the client?
+     * - `sameSite`: SameSite value for cookie
      *
      * ### Examples
      *
@@ -2237,7 +2240,8 @@ class Response implements ResponseInterface
                 'path' => '/',
                 'domain' => '',
                 'secure' => false,
-                'httpOnly' => false
+                'httpOnly' => false,
+                'sameSite' => 'lax'
             ];
             $expires = $data['expire'] ? new DateTime('@' . $data['expire']) : null;
             $cookie = new Cookie(
@@ -2247,7 +2251,8 @@ class Response implements ResponseInterface
                 $data['path'],
                 $data['domain'],
                 $data['secure'],
-                $data['httpOnly']
+                $data['httpOnly'],
+                $data['sameSite']
             );
         }
 
@@ -2373,7 +2378,8 @@ class Response implements ResponseInterface
             'domain' => $cookie->getDomain(),
             'secure' => $cookie->isSecure(),
             'httpOnly' => $cookie->isHttpOnly(),
-            'expire' => $cookie->getExpiresTimestamp()
+            'expire' => $cookie->getExpiresTimestamp(),
+            'sameSite' => $cookie->getSameSite()
         ];
     }
 

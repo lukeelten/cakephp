@@ -181,6 +181,7 @@ class ResponseTransformerTest extends TestCase
             'expire' => 0,
             'secure' => false,
             'httpOnly' => false,
+            'sameSite' => ''
         ];
         $this->assertEquals($expected, $result->cookie('remember_me'));
 
@@ -192,6 +193,7 @@ class ResponseTransformerTest extends TestCase
             'expire' => 1610541040,
             'secure' => true,
             'httpOnly' => true,
+            'sameSite' => ''
         ];
         $this->assertEquals($expected, $result->cookie('forever'));
     }

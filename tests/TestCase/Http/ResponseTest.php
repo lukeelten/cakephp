@@ -1544,7 +1544,8 @@ class ResponseTest extends TestCase
                 'path' => '/',
                 'domain' => '',
                 'secure' => false,
-                'httpOnly' => false
+                'httpOnly' => false,
+                'sameSite' => ''
             ];
             $result = $response->cookie('CakeTestCookie[Testing]');
             $this->assertEquals($expected, $result);
@@ -1565,7 +1566,8 @@ class ResponseTest extends TestCase
                     'path' => '/',
                     'domain' => '',
                     'secure' => false,
-                    'httpOnly' => false
+                    'httpOnly' => false,
+                    'sameSite' => ''
                 ],
                 'CakeTestCookie[Testing2]' => [
                     'name' => 'CakeTestCookie[Testing2]',
@@ -1574,7 +1576,8 @@ class ResponseTest extends TestCase
                     'path' => '/test',
                     'domain' => '',
                     'secure' => true,
-                    'httpOnly' => false
+                    'httpOnly' => false,
+                    'sameSite' => ''
                 ]
             ];
 
@@ -1592,7 +1595,8 @@ class ResponseTest extends TestCase
                     'path' => '/',
                     'domain' => '',
                     'secure' => false,
-                    'httpOnly' => false
+                    'httpOnly' => false,
+                    'sameSite' => ''
                 ],
                 'CakeTestCookie[Testing2]' => [
                     'name' => 'CakeTestCookie[Testing2]',
@@ -1601,10 +1605,55 @@ class ResponseTest extends TestCase
                     'path' => '/test',
                     'domain' => '',
                     'secure' => true,
-                    'httpOnly' => false
+                    'httpOnly' => false,
+                    'sameSite' => ''
                 ]
             ];
 
+            $result = $response->cookie();
+            $this->assertEquals($expected, $result);
+
+            $cookie = [
+                'name' => 'CakeTestCookie[Testing3]',
+                'value' => 'samesite',
+                'expire' => 1000,
+                'path' => '/test',
+                'secure' => true,
+                'sameSite' => 'strict'
+            ];
+            $response->cookie($cookie);
+            $expected = [
+                'CakeTestCookie[Testing]' => [
+                    'name' => 'CakeTestCookie[Testing]',
+                    'value' => 'test',
+                    'expire' => 0,
+                    'path' => '/',
+                    'domain' => '',
+                    'secure' => false,
+                    'httpOnly' => false,
+                    'sameSite' => ''
+                ],
+                'CakeTestCookie[Testing2]' => [
+                    'name' => 'CakeTestCookie[Testing2]',
+                    'value' => '[a,b,c]',
+                    'expire' => 1000,
+                    'path' => '/test',
+                    'domain' => '',
+                    'secure' => true,
+                    'httpOnly' => false,
+                    'sameSite' => ''
+                ],
+                'CakeTestCookie[Testing3]' => [
+                    'name' => 'CakeTestCookie[Testing3]',
+                    'value' => 'samesite',
+                    'expire' => 1000,
+                    'path' => '/test',
+                    'domain' => '',
+                    'secure' => true,
+                    'httpOnly' => false,
+                    'sameSite' => 'strict'
+                ],
+            ];
             $result = $response->cookie();
             $this->assertEquals($expected, $result);
         });
@@ -1628,7 +1677,9 @@ class ResponseTest extends TestCase
             'path' => '/',
             'domain' => '',
             'secure' => false,
-            'httpOnly' => false];
+            'httpOnly' => false,
+            'sameSite' => ''
+        ];
         $result = $new->getCookie('testing');
         $this->assertEquals($expected, $result);
     }
@@ -1685,7 +1736,8 @@ class ResponseTest extends TestCase
             'path' => '/test',
             'domain' => '',
             'secure' => true,
-            'httpOnly' => false
+            'httpOnly' => false,
+            'sameSite' => ''
         ];
 
         // Match the date time formatting to Response::convertCookieToArray
@@ -1734,6 +1786,7 @@ class ResponseTest extends TestCase
             'path' => '/custompath/',
             'secure' => true,
             'httpOnly' => true,
+            'sameSite' => '',
             'expire' => new \DateTimeImmutable('+14 days'),
         ];
 
@@ -1744,7 +1797,8 @@ class ResponseTest extends TestCase
             $options['path'],
             $options['domain'],
             $options['secure'],
-            $options['httpOnly']
+            $options['httpOnly'],
+            $options['sameSite']
         );
 
         $response = new Response();
@@ -1791,7 +1845,8 @@ class ResponseTest extends TestCase
                 'path' => '/',
                 'domain' => '',
                 'secure' => false,
-                'httpOnly' => false
+                'httpOnly' => false,
+                'sameSite' => ''
             ],
             'test2' => [
                 'name' => 'test2',
@@ -1800,7 +1855,8 @@ class ResponseTest extends TestCase
                 'path' => '/test',
                 'domain' => '',
                 'secure' => true,
-                'httpOnly' => false
+                'httpOnly' => false,
+                'sameSite' => ''
             ]
         ];
         $this->assertEquals($expected, $new->getCookies());
@@ -1816,7 +1872,8 @@ class ResponseTest extends TestCase
         $response = new Response();
         $cookie = (new Cookie('urmc'))
             ->withValue(['user_id' => 1, 'token' => 'abc123'])
-            ->withHttpOnly(true);
+            ->withHttpOnly(true)
+            ->withSameSite('strict');
 
         $new = $response->withCookie($cookie);
         $expected = [
@@ -1827,7 +1884,8 @@ class ResponseTest extends TestCase
                 'path' => '/',
                 'domain' => '',
                 'secure' => false,
-                'httpOnly' => true
+                'httpOnly' => true,
+                'sameSite' => 'strict'
             ],
         ];
         $this->assertEquals($expected, $new->getCookies());
