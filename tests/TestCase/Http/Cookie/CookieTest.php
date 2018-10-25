@@ -80,10 +80,11 @@ class CookieTest extends TestCase
         $cookie = $cookie->withDomain('cakephp.org')
             ->withExpiry($date)
             ->withHttpOnly(true)
-            ->withSecure(true);
+            ->withSecure(true)
+            ->withSameSite('lax');
         $result = $cookie->toHeaderValue();
 
-        $expected = 'cakephp=cakephp-rocks; expires=Wed, 01-Dec-2027 12:00:00 GMT; path=/; domain=cakephp.org; secure; httponly';
+        $expected = 'cakephp=cakephp-rocks; expires=Wed, 01-Dec-2027 12:00:00 GMT; path=/; domain=cakephp.org; secure; httponly; samesite=lax';
         $this->assertEquals($expected, $result);
     }
 
@@ -397,6 +398,43 @@ class CookieTest extends TestCase
         $this->assertNotSame($new, $cookie, 'Should clone');
         $this->assertNotSame('user', $cookie->getName());
         $this->assertSame('user', $new->getName());
+    }
+
+    public function testGetSameSite()
+    {
+        $cookie = new Cookie('cakephp', 'cakephp-rocks');
+        $this->assertSame('', $cookie->getSameSite());
+
+        $cookie = new Cookie('cakephp', 'cakephp-rocks',null,'/','',false,false,'strict');
+        $this->assertSame('strict', $cookie->getSameSite());
+
+    }
+
+    public function testWithSameSite()
+    {
+        $cookie = new Cookie('cakephp', 'cakephp-rocks');
+        $this->assertSame('', $cookie->getSameSite());
+
+        $cookie = $cookie->withSameSite('lax');
+        $this->assertSame('lax', $cookie->getSameSite());
+    }
+
+    public function testInvalidSameSite()
+    {
+        try {
+            $cookie = new Cookie('cakephp', 'cakephp-rocks',null,'/','',false,false,'cakephp');
+            $this->fail('Expected InvalidArgumentException');
+        } catch (\InvalidArgumentException $ex) {
+            $this->assertSame(\InvalidArgumentException::class, get_class($ex));
+        }
+
+        try {
+            $cookie = new Cookie('cakephp', 'cakephp-rocks');
+            $cookie->withSameSite("cakephp");
+            $this->fail('Expected InvalidArgumentException');
+        } catch (\InvalidArgumentException $ex) {
+            $this->assertSame(\InvalidArgumentException::class, get_class($ex));
+        }
     }
 
     /**

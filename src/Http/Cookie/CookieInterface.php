@@ -193,6 +193,17 @@ interface CookieInterface
     public function withSecure($secure);
 
     /**
+     * @return string
+     */
+    public function getSameSite();
+
+    /**
+     * @param string|null $sameSite
+     * @return static
+     */
+    public function withSameSite($sameSite);
+
+    /**
      * Returns the cookie as header value
      *
      * @return string

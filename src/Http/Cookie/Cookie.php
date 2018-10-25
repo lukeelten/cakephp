@@ -105,6 +105,11 @@ class Cookie implements CookieInterface
     protected $httpOnly = false;
 
     /**
+     * @var string|null
+     */
+    protected $sameSite = null;
+
+    /**
      * Constructor
      *
      * The constructors args are similar to the native PHP `setcookie()` method.
@@ -119,6 +124,7 @@ class Cookie implements CookieInterface
      * @param string $domain Domain
      * @param bool $secure Is secure
      * @param bool $httpOnly HTTP Only
+     * @param string|null $sameSite SameSite flag, possible values are 'lax', 'strict'
      */
     public function __construct(
         $name,
@@ -127,7 +133,8 @@ class Cookie implements CookieInterface
         $path = '/',
         $domain = '',
         $secure = false,
-        $httpOnly = false
+        $httpOnly = false,
+        $sameSite = null
     ) {
         $this->validateName($name);
         $this->name = $name;
@@ -149,6 +156,9 @@ class Cookie implements CookieInterface
             $expiresAt = $expiresAt->setTimezone(new DateTimeZone('GMT'));
         }
         $this->expiresAt = $expiresAt;
+
+        $this->validateSameSite($sameSite);
+        $this->sameSite = $sameSite;
     }
 
     /**
@@ -178,6 +188,10 @@ class Cookie implements CookieInterface
         }
         if ($this->httpOnly) {
             $headerValue[] = 'httponly';
+        }
+
+        if (!empty($this->sameSite)) {
+            $headerValue[] = 'samesite=' . $this->sameSite;
         }
 
         return implode('; ', $headerValue);
@@ -229,6 +243,22 @@ class Cookie implements CookieInterface
 
         if (empty($name)) {
             throw new InvalidArgumentException('The cookie name cannot be empty.');
+        }
+    }
+
+    /**
+     * @param string|null $sameSite
+     * @return void
+     * @throws \InvalidArgumentException
+     * @link https://www.owasp.org/index.php/SameSite Valid values for SameSite
+     */
+    protected function validateSameSite($sameSite)
+    {
+        $sameSiteValidValues = ['lax', 'strict'];
+        if (!empty($sameSite) && !in_array($sameSite, $sameSiteValidValues)) {
+            throw new \InvalidArgumentException(
+                sprintf('Value "%s" is invalid for SameSite cookie option.', $sameSite)
+            );
         }
     }
 
@@ -466,6 +496,32 @@ class Cookie implements CookieInterface
 
         return $new;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSameSite()
+    {
+        if (empty($this->sameSite)) {
+            return '';
+        }
+
+        return $this->sameSite;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function withSameSite($sameSite)
+    {
+        $this->validateSameSite($sameSite);
+
+        $new = clone $this;
+        $new->sameSite = $sameSite;
+
+        return $new;
+    }
+
 
     /**
      * Checks if a value exists in the cookie data.

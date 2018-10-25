@@ -351,7 +351,8 @@ class CookieCollection implements IteratorAggregate, Countable
                 'secure' => false,
                 'httponly' => false,
                 'expires' => null,
-                'max-age' => null
+                'max-age' => null,
+                'samesite' => null
             ];
             foreach ($parts as $i => $part) {
                 if (strpos($part, '=') !== false) {
@@ -389,7 +390,8 @@ class CookieCollection implements IteratorAggregate, Countable
                     $cookie['path'],
                     $cookie['domain'],
                     $cookie['secure'],
-                    $cookie['httponly']
+                    $cookie['httponly'],
+                    $cookie['samesite']
                 );
             } catch (Exception $e) {
                 // Don't blow up on invalid cookies
