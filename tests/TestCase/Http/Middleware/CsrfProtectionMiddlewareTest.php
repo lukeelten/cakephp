@@ -85,6 +85,7 @@ class CsrfProtectionMiddlewareTest extends TestCase
             $this->assertEquals(0, $cookie['expire'], 'session duration.');
             $this->assertEquals('/dir/', $cookie['path'], 'session path.');
             $this->assertEquals($cookie['value'], $request->getParam('_csrfToken'));
+            $this->assertEquals('', $cookie['sameSite']);
         };
 
         $middleware = new CsrfProtectionMiddleware();
@@ -274,6 +275,7 @@ class CsrfProtectionMiddlewareTest extends TestCase
             $this->assertEquals('/dir/', $cookie['path'], 'session path.');
             $this->assertTrue($cookie['secure'], 'cookie security flag missing');
             $this->assertTrue($cookie['httpOnly'], 'cookie httpOnly flag missing');
+            $this->assertSame('', $cookie['sameSite']);
         };
 
         $middleware = new CsrfProtectionMiddleware([
@@ -308,5 +310,41 @@ class CsrfProtectionMiddlewareTest extends TestCase
         ]);
         $response = $middleware($request, $response, $this->_getNextClosure());
         $this->assertInstanceOf(Response::class, $response);
+    }
+
+    public function testSameSiteOption()
+    {
+        $request = new ServerRequest([
+            'environment' => ['REQUEST_METHOD' => 'GET'],
+            'webroot' => '/dir/'
+        ]);
+        $response = new Response();
+        $closure = function ($request, $response) {
+            $cookie = $response->getCookie('csrfToken');
+            $this->assertSame('lax', $cookie['sameSite']);
+        };
+
+        $middleware = new CsrfProtectionMiddleware([
+            'sameSite' => 'lax'
+        ]);
+        $middleware($request, $response, $closure);
+    }
+
+    public function testInvalidSameSiteOption() {
+        $this->expectException(\InvalidArgumentException::class);
+
+        $request = new ServerRequest([
+            'environment' => ['REQUEST_METHOD' => 'GET'],
+            'webroot' => '/dir/'
+        ]);
+        $response = new Response();
+        $closure = function ($request, $response) {
+            // Intentionally Empty
+        };
+
+        $middleware = new CsrfProtectionMiddleware([
+            'sameSite' => 'cakephp'
+        ]);
+        $middleware($request, $response, $closure);
     }
 }

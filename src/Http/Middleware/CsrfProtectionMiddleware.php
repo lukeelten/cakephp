@@ -46,6 +46,7 @@ class CsrfProtectionMiddleware
      *    Defaults to browser session.
      *  - `secure` Whether or not the cookie will be set with the Secure flag. Defaults to false.
      *  - `httpOnly` Whether or not the cookie will be set with the HttpOnly flag. Defaults to false.
+     *  - `sameSite` SameSite value for cookie
      *  - `field` The form field to check. Changing this will also require configuring
      *    FormHelper.
      *
@@ -56,6 +57,7 @@ class CsrfProtectionMiddleware
         'expiry' => 0,
         'secure' => false,
         'httpOnly' => false,
+        'sameSite' => null,
         'field' => '_csrfToken',
     ];
 
@@ -172,7 +174,8 @@ class CsrfProtectionMiddleware
             $request->getAttribute('webroot'),
             '',
             (bool)$this->_config['secure'],
-            (bool)$this->_config['httpOnly']
+            (bool)$this->_config['httpOnly'],
+            $this->_config['sameSite']
         );
 
         return $response->withCookie($cookie);
